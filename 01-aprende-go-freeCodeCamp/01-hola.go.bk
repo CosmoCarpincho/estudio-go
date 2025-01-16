@@ -43,5 +43,4 @@ func main() {
 
     listaPaises4 := listaPaises[:2]
     fmt.Println(listaPaises4)
-
 }

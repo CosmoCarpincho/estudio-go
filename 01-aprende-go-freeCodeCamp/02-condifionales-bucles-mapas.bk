@@ -1,0 +1,13 @@
+package main
+
+import "fmt"
+
+func main() {
+  fmt.Println("")
+
+  var miMapa = map[string]
+
+  // Seuir desde min 39:22 mapas. https://www.youtube.com/watch?v=L_yYVEC8GZo&t=47s
+
+
+}
