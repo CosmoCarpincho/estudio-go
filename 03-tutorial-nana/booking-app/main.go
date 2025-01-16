@@ -1,31 +1,45 @@
 package main
 
 import (
+	"booking-app/helper"
 	"fmt"
-	"strings"
+	"time"
+  "sync"
 )
 
-	var conferenceName = "Go Conference"
-	const conferenceTickets = 50
-	var remainingTickets uint = 50
-	var bookings []string
-	// bookings := []string{}
+var conferenceName = "Go Conference"
+
+const conferenceTickets = 50
+
+var remainingTickets uint = 50
+var bookings = make([]UserData, 0)
+
+type UserData struct {
+  firstName string
+  lastName string
+  email string
+  numberOfTickets uint
+}
+
+var wg = sync.WaitGroup{}
 
 func main() {
 
-	greetUsers(conferenceName, conferenceTickets, remainingTickets)
+	greetUsers()
 
 	for {
 
 		firstName, lastName, email, userTickets := getUserInput()
-		isValidName, isValidEmail, isValidTicketNumber := validateUserInput(firstName, lastName, email, userTickets, remainingTickets)
+		isValidName, isValidEmail, isValidTicketNumber := helper.ValidateUserInput(firstName, lastName, email, userTickets, remainingTickets)
 
 		if isValidName && isValidEmail && isValidTicketNumber {
 
-      bookTicket(remainingTickets, userTickets, bookings, firstName, lastName, email, conferenceName) 
+			bookTicket(userTickets, firstName, lastName, email)
 
+      wg.Add(1)
+      go sendTicket(userTickets, firstName, lastName, email)
 
-			firstNames := getFirstNames(bookings)
+			firstNames := getFirstNames()
 			fmt.Printf("The first names of bookings are: %v\n", firstNames)
 
 			noTicketsRemaining := remainingTickets == 0
@@ -45,29 +59,22 @@ func main() {
 			}
 		}
 	}
+
+  wg.Wait()
 }
 
-func greetUsers(confName string, conferenceTickets int, remainingTickets uint) {
-	fmt.Printf("Welcome to %v booking application\n", confName)
+func greetUsers() {
+	fmt.Printf("Welcome to %v booking application\n", conferenceName)
 	fmt.Printf("We have total of %v tickets and %v are still available.\n", conferenceTickets, remainingTickets)
 	fmt.Println("Get yout tickets here to attend")
 }
 
-func getFirstNames(bookings []string) []string {
+func getFirstNames() []string {
 	firstNames := []string{}
 	for _, booking := range bookings {
-		var names = strings.Fields(booking)
-		firstNames = append(firstNames, names[0])
+		firstNames = append(firstNames, booking.firstName)
 	}
 	return firstNames
-}
-
-func validateUserInput(firstName string, lastName string, email string, userTickets uint, remainingTickets uint) (bool, bool, bool) {
-	isValidName := len(firstName) >= 2 && len(lastName) >= 2
-	isValidEmail := strings.Contains(email, "@")
-	isValidTicketNumber := userTickets > 0 && userTickets <= remainingTickets
-
-	return isValidName, isValidEmail, isValidTicketNumber
 }
 
 func getUserInput() (string, string, string, uint) {
@@ -92,12 +99,31 @@ func getUserInput() (string, string, string, uint) {
 
 }
 
-func bookTicket(remainingTickets uint, userTickets uint, bookings []string, firstName string, lastName string, email string, conferenceName string) {
+func bookTicket(userTickets uint, firstName string, lastName string, email string) {
 	remainingTickets = remainingTickets - userTickets
-	bookings = append(bookings, firstName+" "+lastName)
+
+  var userData = UserData {
+    firstName: firstName,
+    lastName: lastName,
+    email: email,
+    numberOfTickets: userTickets,
+  }
+
+
+
+	bookings = append(bookings, userData)
+  fmt.Printf("List of bookings is %v\n", bookings)
 
 	fmt.Printf("Thank you %v %v for booking %v tickets. You will receive a confirmation email at %v\n", firstName, lastName, userTickets, email)
 	fmt.Printf("%v tickets remaining for %v\n", remainingTickets, conferenceName)
 }
 
-// 40:59
+
+func sendTicket(userTickets uint, firstName string, lastName string, email string) {
+  time.Sleep(10 * time.Second)
+  var ticket = fmt.Sprintf("%v tickets for %v %v", userTickets, firstName, lastName)
+  fmt.Println("##################")
+  fmt.Printf("Sending ticket:\n %v \nto email address %v\n", ticket, email)
+  fmt.Println("##################")
+  wg.Done()
+}
