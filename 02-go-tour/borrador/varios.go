@@ -215,6 +215,6 @@ var (
   p = &Vertex{1, 2}
 )
 
-func main_?() {
+func main_5() {
   fmt.Println(v1, p, v2, v3)
 }
