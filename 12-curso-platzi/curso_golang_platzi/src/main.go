@@ -1,25 +1,34 @@
 package main
 
-import (
-	"fmt"
-	"math"
-)
-
-const pi = 3.141592
+import "fmt"
 
 func main() {
-	fmt.Println(areaCirculo(10))
-	fmt.Println(areaTrapecio(10.8, 17.5, 8.35))
-}
+	for i := 0; i < 10; i++ {
+		fmt.Printf("+ %d +", i)
+	}
 
-func areaCirculo(radio float64) float64 {
-	areaCirculo := math.Pow(radio, 2) * pi
-	return areaCirculo
-}
+	fmt.Println()
 
-func areaTrapecio(base1 float64, base2 float64, altura float64) float64 {
-	areaTrapecio := (base1 + base2) * altura / 2
+	for i := range 10 {
+		fmt.Printf("- %d -", i)
+	}
 
-	return areaTrapecio
+	// For while
+	counter := 0
+	for counter < 10 {
+		fmt.Println(counter)
+		counter++
+	}
+
+	// For forever
+	counterForever := 0
+	for {
+		fmt.Println(counterForever)
+		counterForever++
+
+		if counterForever == 20 {
+			break
+		}
+	}
 
 }
